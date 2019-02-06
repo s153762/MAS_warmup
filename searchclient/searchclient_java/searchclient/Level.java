@@ -15,21 +15,22 @@ public class Level {
 
     public Level(int max_col){
         this.max_col = max_col;
-        this.max_row = 5*max_col;
+        this.max_row = 0;
         this.goalsList = new ArrayList<char[]>();
         this.wallsList = new ArrayList<boolean[]>();
     }
 
-    public void setGoal(char goal, int row, int col){
+    public void addGoal(char goal, int row, int col){
         // Dynamic amount of rows
         while(goalsList.size() <= row){
             char[] goalRow = new char[max_col];
             goalsList.add(goalRow);
         }
-        goalsList.get(row)[col] = goal;
+        this.goalsList.get(row)[col] = goal;
+        this.max_row = wallsList.size();
     }
 
-    public void setWall(boolean wall, int row, int col){
+    public void addWall(boolean wall, int row, int col){
         // Dynamic amount of rows
         while(wallsList.size() <= row){
             boolean[] goalRow = new boolean[max_col];

@@ -1,7 +1,6 @@
 package searchclient;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -28,7 +27,8 @@ public class SearchClient {
                 char chr = line.charAt(col);
 
                 if (chr == '+') { // Wall.
-                    level.setWall(true, row,col);
+                    level.addWall(true, row,col);
+                    this.initialState.updateBoxesArraySize();
                 } else if ('0' <= chr && chr <= '9') { // Agent.
                     if (agentFound) {
                         System.err.println("Error, not a single agent level");
@@ -38,9 +38,9 @@ public class SearchClient {
                     this.initialState.agentRow = row;
                     this.initialState.agentCol = col;
                 } else if ('A' <= chr && chr <= 'Z') { // Box.
-                    this.initialState.boxes[row][col] = chr;
+                    this.initialState.addBox(chr, row, col);
                 } else if ('a' <= chr && chr <= 'z') { // Goal.
-                    level.setGoal(chr,row,col);
+                    level.addGoal(chr,row,col);
                 } else if (chr == ' ') {
                     // Free space.
                 } else {

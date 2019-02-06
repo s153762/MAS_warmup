@@ -12,8 +12,8 @@ public class TestLevel {
     public void before(){
         Level level = new Level(10);
         this.level = level;
-        level.setWall(true,0,0);
-        level.setGoal('X',0,1);
+        level.addWall(true,0,0);
+        level.addGoal('X',0,1);
     }
 
     @Test
@@ -22,6 +22,6 @@ public class TestLevel {
         assertEquals(true,level.getWall(0,0));
 
         assertEquals(10,level.getMaxCol());
-        assertEquals(50,level.getMaxRow());
+        assertEquals(1,level.getMaxRow());
     }
 }

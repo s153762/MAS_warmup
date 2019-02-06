@@ -21,7 +21,8 @@ public class State {
     // this.walls[row][col] is true if there's a wall at (row, col)
     //
 
-    public char[][] boxes;
+    public ArrayList<char[]> boxesList;
+    //public char[][] boxes;
 
     public State parent;
     public Command action;
@@ -32,7 +33,7 @@ public class State {
 
     public State(State parent) {
         this.parent = parent;
-        this.boxes = new char[Level.getMaxRow()][Level.getMaxCol()];
+        this.boxesList = new ArrayList<char[]>();
         if (parent == null) {
             this.g = 0;
         } else {
@@ -52,7 +53,7 @@ public class State {
         for (int row = 1; row < Level.getMaxRow() - 1; row++) {
             for (int col = 1; col < Level.getMaxCol() - 1; col++) {
                 char g = Level.getGoal(row,col);
-                char b = Character.toLowerCase(boxes[row][col]);
+                char b = Character.toLowerCase(boxesList.get(row)[col]);
                 if (g > 0 && b != g) {
                     return false;
                 }
@@ -88,8 +89,8 @@ public class State {
                         n.action = c;
                         n.agentRow = newAgentRow;
                         n.agentCol = newAgentCol;
-                        n.boxes[newBoxRow][newBoxCol] = this.boxes[newAgentRow][newAgentCol];
-                        n.boxes[newAgentRow][newAgentCol] = 0;
+                        n.boxesList.get(newBoxRow)[newBoxCol] = this.boxesList.get(newAgentRow)[newAgentCol];
+                        n.boxesList.get(newAgentRow)[newAgentCol] = 0;
                         expandedStates.add(n);
                     }
                 }
@@ -104,8 +105,8 @@ public class State {
                         n.action = c;
                         n.agentRow = newAgentRow;
                         n.agentCol = newAgentCol;
-                        n.boxes[this.agentRow][this.agentCol] = this.boxes[boxRow][boxCol];
-                        n.boxes[boxRow][boxCol] = 0;
+                        n.boxesList.get(this.agentRow)[this.agentCol] = this.boxesList.get(boxRow)[boxCol];
+                        n.boxesList.get(boxRow)[boxCol] = 0;
                         expandedStates.add(n);
                     }
                 }
@@ -116,17 +117,20 @@ public class State {
     }
 
     private boolean cellIsFree(int row, int col) {
-        return !Level.getWall(row,col) && this.boxes[row][col] == 0;
+        return !Level.getWall(row,col) && this.boxesList.get(row)[col] == 0;
     }
 
     private boolean boxAt(int row, int col) {
-        return this.boxes[row][col] > 0;
+        return this.boxesList.get(row)[col] > 0;
     }
 
     private State ChildState() {
         State copy = new State(this);
-        for (int row = 0; row < Level.getMaxRow(); row++) {
-            System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, Level.getMaxCol());
+        int i = 0;
+        for (char[] row: this.boxesList) {
+            copy.boxesList.add(new char[Level.getMaxCol()]);
+            System.arraycopy(row, 0, copy.boxesList.get(i), 0, Level.getMaxCol());
+            i++;
         }
         return copy;
     }
@@ -142,6 +146,17 @@ public class State {
         return plan;
     }
 
+    private char[][] boxesToList(ArrayList<char[]> boxesList){
+        char[][] boxes = new char[Level.getMaxRow()][Level.getMaxCol()];
+
+        int i = 0;
+        for (char[] row: boxesList){
+            boxes[i] = row;
+            i++;
+        }
+        return boxes;
+    }
+
     @Override
     public int hashCode() {
         if (this._hash == 0) {
@@ -149,7 +164,7 @@ public class State {
             int result = 1;
             result = prime * result + this.agentCol;
             result = prime * result + this.agentRow;
-            result = prime * result + Arrays.deepHashCode(this.boxes);
+            result = prime * result + Arrays.deepHashCode(boxesToList(this.boxesList));
             result = prime * result + Arrays.deepHashCode(Level.getGoals());
             result = prime * result + Arrays.deepHashCode(Level.getWalls());
             this._hash = result;
@@ -168,7 +183,7 @@ public class State {
         State other = (State) obj;
         if (this.agentRow != other.agentRow || this.agentCol != other.agentCol)
             return false;
-        return Arrays.deepEquals(this.boxes, other.boxes);
+        return Arrays.deepEquals(boxesToList(this.boxesList), boxesToList(other.boxesList));
     }
 
     @Override
@@ -179,8 +194,8 @@ public class State {
                 break;
             }
             for (int col = 0; col < Level.getMaxCol(); col++) {
-                if (this.boxes[row][col] > 0) {
-                    s.append(this.boxes[row][col]);
+                if (this.boxesList.get(row)[col] > 0) {
+                    s.append(this.boxesList.get(row)[col]);
                 } else if (Level.getGoal(row,col) > 0) {
                     s.append(Level.getGoal(row,col));
                 } else if (Level.getWall(row,col)) {
@@ -196,4 +211,19 @@ public class State {
         return s.toString();
     }
 
+    public void addBox(char chr, int row, int col) {
+        // Dynamic amount of rows
+        while(this.boxesList.size() <= row){
+            char[] boxRow = new char[Level.getMaxCol()];
+            this.boxesList.add(boxRow);
+        }
+        this.boxesList.get(row)[col] = chr;
+    }
+
+    public void updateBoxesArraySize() {
+        while(this.boxesList.size() < Level.getMaxRow()){
+            char[] boxRow = new char[Level.getMaxCol()];
+            this.boxesList.add(boxRow);
+        }
+    }
 }
