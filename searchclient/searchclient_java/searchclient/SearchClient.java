@@ -17,14 +17,17 @@ public class SearchClient {
 
         int row = 0;
         boolean agentFound = false;
-        this.initialState = new State(null);
+
+        Level level = new Level(line.length(),(int) serverMessages.lines().count());
+        this.initialState = new State(null, level);
 
         while (!line.equals("")) {
             for (int col = 0; col < line.length(); col++) {
                 char chr = line.charAt(col);
 
                 if (chr == '+') { // Wall.
-                    this.initialState.walls[row][col] = true;
+                    System.err.println("Setting wall at row "+row+" and col "+col);
+                    level.setWall(true, row,col);
                 } else if ('0' <= chr && chr <= '9') { // Agent.
                     if (agentFound) {
                         System.err.println("Error, not a single agent level");
@@ -36,7 +39,8 @@ public class SearchClient {
                 } else if ('A' <= chr && chr <= 'Z') { // Box.
                     this.initialState.boxes[row][col] = chr;
                 } else if ('a' <= chr && chr <= 'z') { // Goal.
-                    this.initialState.goals[row][col] = chr;
+                    System.err.println("Setting goal at row "+row+" and col "+col);
+                    level.setGoal(chr,row,col);
                 } else if (chr == ' ') {
                     // Free space.
                 } else {

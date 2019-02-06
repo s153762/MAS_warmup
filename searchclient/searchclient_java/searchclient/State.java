@@ -8,8 +8,8 @@ import java.util.Random;
 public class State {
     private static final Random RNG = new Random(1);
 
-    public static int MAX_ROW = 70;
-    public static int MAX_COL = 70;
+    //public static int MAX_ROW = 70;
+    //public static int MAX_COL = 70;
 
     public int agentRow;
     public int agentCol;
@@ -23,20 +23,22 @@ public class State {
     // E.g. this.walls[2] is an array of booleans having size MAX_COL.
     // this.walls[row][col] is true if there's a wall at (row, col)
     //
-
-    public boolean[][] walls = new boolean[MAX_ROW][MAX_COL];
-    public char[][] boxes = new char[MAX_ROW][MAX_COL];
-    public char[][] goals = new char[MAX_ROW][MAX_COL];
+    
+    public char[][] boxes;
 
     public State parent;
     public Command action;
 
     private int g;
+    private Level level;
 
     private int _hash = 0;
 
-    public State(State parent) {
+    public State(State parent, Level level) {
         this.parent = parent;
+        this.level = level;
+        System.err.println("max row is "+level.getMaxRow()+" and max col is "+level.getMaxCol());
+        this.boxes = new char[level.getMaxRow()][level.getMaxCol()];
         if (parent == null) {
             this.g = 0;
         } else {
@@ -53,9 +55,9 @@ public class State {
     }
 
     public boolean isGoalState() {
-        for (int row = 1; row < MAX_ROW - 1; row++) {
-            for (int col = 1; col < MAX_COL - 1; col++) {
-                char g = goals[row][col];
+        for (int row = 1; row < level.getMaxRow() - 1; row++) {
+            for (int col = 1; col < level.getMaxCol() - 1; col++) {
+                char g = level.getGoal(row,col);
                 char b = Character.toLowerCase(boxes[row][col]);
                 if (g > 0 && b != g) {
                     return false;
@@ -66,7 +68,7 @@ public class State {
     }
 
     public ArrayList<State> getExpandedStates() {
-        ArrayList<State> expandedStates = new ArrayList<>(Command.EVERY.length);
+        ArrayList<State> expandedStates = new ArrayList<>(searchclient.Command.EVERY.length);
         for (Command c : Command.EVERY) {
             // Determine applicability of action
             int newAgentRow = this.agentRow + Command.dirToRowChange(c.dir1);
@@ -120,7 +122,7 @@ public class State {
     }
 
     private boolean cellIsFree(int row, int col) {
-        return !this.walls[row][col] && this.boxes[row][col] == 0;
+        return !level.getWall(row,col) && this.boxes[row][col] == 0;
     }
 
     private boolean boxAt(int row, int col) {
@@ -128,11 +130,9 @@ public class State {
     }
 
     private State ChildState() {
-        State copy = new State(this);
-        for (int row = 0; row < MAX_ROW; row++) {
-            System.arraycopy(this.walls[row], 0, copy.walls[row], 0, MAX_COL);
-            System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, MAX_COL);
-            System.arraycopy(this.goals[row], 0, copy.goals[row], 0, MAX_COL);
+        State copy = new State(this, level);
+        for (int row = 0; row < level.getMaxRow(); row++) {
+            System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, level.getMaxCol());
         }
         return copy;
     }
@@ -156,8 +156,8 @@ public class State {
             result = prime * result + this.agentCol;
             result = prime * result + this.agentRow;
             result = prime * result + Arrays.deepHashCode(this.boxes);
-            result = prime * result + Arrays.deepHashCode(this.goals);
-            result = prime * result + Arrays.deepHashCode(this.walls);
+            result = prime * result + Arrays.deepHashCode(level.getGoals());
+            result = prime * result + Arrays.deepHashCode(level.getWalls());
             this._hash = result;
         }
         return this._hash;
@@ -174,26 +174,22 @@ public class State {
         State other = (State) obj;
         if (this.agentRow != other.agentRow || this.agentCol != other.agentCol)
             return false;
-        if (!Arrays.deepEquals(this.boxes, other.boxes))
-            return false;
-        if (!Arrays.deepEquals(this.goals, other.goals))
-            return false;
-        return Arrays.deepEquals(this.walls, other.walls);
+        return Arrays.deepEquals(this.boxes, other.boxes);
     }
 
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        for (int row = 0; row < MAX_ROW; row++) {
-            if (!this.walls[row][0]) {
+        for (int row = 0; row < level.getMaxRow(); row++) {
+            if (!level.getWallVertical(row)[0]) {
                 break;
             }
-            for (int col = 0; col < MAX_COL; col++) {
+            for (int col = 0; col < level.getMaxCol(); col++) {
                 if (this.boxes[row][col] > 0) {
                     s.append(this.boxes[row][col]);
-                } else if (this.goals[row][col] > 0) {
-                    s.append(this.goals[row][col]);
-                } else if (this.walls[row][col]) {
+                } else if (level.getGoal(row,col) > 0) {
+                    s.append(level.getGoal(row,col));
+                } else if (level.getWall(row,col)) {
                     s.append("+");
                 } else if (row == this.agentRow && col == this.agentCol) {
                     s.append("0");
