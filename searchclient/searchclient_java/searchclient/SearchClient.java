@@ -1,6 +1,7 @@
 package searchclient;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
@@ -15,18 +16,18 @@ public class SearchClient {
             System.exit(1);
         }
 
-        int row = 0;
-        boolean agentFound = false;
+        // Set maximum column length to the size of the first line
+        Level level = new Level(line.length());
+        this.initialState = new State(null);
 
-        Level level = new Level(line.length(),(int) serverMessages.lines().count());
-        this.initialState = new State(null, level);
+        boolean agentFound = false;
+        int row = 0;
 
         while (!line.equals("")) {
             for (int col = 0; col < line.length(); col++) {
                 char chr = line.charAt(col);
 
                 if (chr == '+') { // Wall.
-                    System.err.println("Setting wall at row "+row+" and col "+col);
                     level.setWall(true, row,col);
                 } else if ('0' <= chr && chr <= '9') { // Agent.
                     if (agentFound) {
@@ -39,7 +40,6 @@ public class SearchClient {
                 } else if ('A' <= chr && chr <= 'Z') { // Box.
                     this.initialState.boxes[row][col] = chr;
                 } else if ('a' <= chr && chr <= 'z') { // Goal.
-                    System.err.println("Setting goal at row "+row+" and col "+col);
                     level.setGoal(chr,row,col);
                 } else if (chr == ' ') {
                     // Free space.

@@ -8,9 +8,6 @@ import java.util.Random;
 public class State {
     private static final Random RNG = new Random(1);
 
-    //public static int MAX_ROW = 70;
-    //public static int MAX_COL = 70;
-
     public int agentRow;
     public int agentCol;
 
@@ -23,22 +20,19 @@ public class State {
     // E.g. this.walls[2] is an array of booleans having size MAX_COL.
     // this.walls[row][col] is true if there's a wall at (row, col)
     //
-    
+
     public char[][] boxes;
 
     public State parent;
     public Command action;
 
     private int g;
-    private Level level;
 
     private int _hash = 0;
 
-    public State(State parent, Level level) {
+    public State(State parent) {
         this.parent = parent;
-        this.level = level;
-        System.err.println("max row is "+level.getMaxRow()+" and max col is "+level.getMaxCol());
-        this.boxes = new char[level.getMaxRow()][level.getMaxCol()];
+        this.boxes = new char[Level.getMaxRow()][Level.getMaxCol()];
         if (parent == null) {
             this.g = 0;
         } else {
@@ -55,9 +49,9 @@ public class State {
     }
 
     public boolean isGoalState() {
-        for (int row = 1; row < level.getMaxRow() - 1; row++) {
-            for (int col = 1; col < level.getMaxCol() - 1; col++) {
-                char g = level.getGoal(row,col);
+        for (int row = 1; row < Level.getMaxRow() - 1; row++) {
+            for (int col = 1; col < Level.getMaxCol() - 1; col++) {
+                char g = Level.getGoal(row,col);
                 char b = Character.toLowerCase(boxes[row][col]);
                 if (g > 0 && b != g) {
                     return false;
@@ -122,7 +116,7 @@ public class State {
     }
 
     private boolean cellIsFree(int row, int col) {
-        return !level.getWall(row,col) && this.boxes[row][col] == 0;
+        return !Level.getWall(row,col) && this.boxes[row][col] == 0;
     }
 
     private boolean boxAt(int row, int col) {
@@ -130,9 +124,9 @@ public class State {
     }
 
     private State ChildState() {
-        State copy = new State(this, level);
-        for (int row = 0; row < level.getMaxRow(); row++) {
-            System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, level.getMaxCol());
+        State copy = new State(this);
+        for (int row = 0; row < Level.getMaxRow(); row++) {
+            System.arraycopy(this.boxes[row], 0, copy.boxes[row], 0, Level.getMaxCol());
         }
         return copy;
     }
@@ -156,8 +150,8 @@ public class State {
             result = prime * result + this.agentCol;
             result = prime * result + this.agentRow;
             result = prime * result + Arrays.deepHashCode(this.boxes);
-            result = prime * result + Arrays.deepHashCode(level.getGoals());
-            result = prime * result + Arrays.deepHashCode(level.getWalls());
+            result = prime * result + Arrays.deepHashCode(Level.getGoals());
+            result = prime * result + Arrays.deepHashCode(Level.getWalls());
             this._hash = result;
         }
         return this._hash;
@@ -180,16 +174,16 @@ public class State {
     @Override
     public String toString() {
         StringBuilder s = new StringBuilder();
-        for (int row = 0; row < level.getMaxRow(); row++) {
-            if (!level.getWallVertical(row)[0]) {
+        for (int row = 0; row < Level.getMaxRow(); row++) {
+            if (!Level.getWallVertical(row)[0]) {
                 break;
             }
-            for (int col = 0; col < level.getMaxCol(); col++) {
+            for (int col = 0; col < Level.getMaxCol(); col++) {
                 if (this.boxes[row][col] > 0) {
                     s.append(this.boxes[row][col]);
-                } else if (level.getGoal(row,col) > 0) {
-                    s.append(level.getGoal(row,col));
-                } else if (level.getWall(row,col)) {
+                } else if (Level.getGoal(row,col) > 0) {
+                    s.append(Level.getGoal(row,col));
+                } else if (Level.getWall(row,col)) {
                     s.append("+");
                 } else if (row == this.agentRow && col == this.agentCol) {
                     s.append("0");
