@@ -52,7 +52,7 @@ public class State {
     public boolean isGoalState() {
         for (int row = 1; row < Level.getMaxRow() - 1; row++) {
             for (int col = 1; col < Level.getMaxCol() - 1; col++) {
-                char g = Level.getGoal(row,col);
+                char g = Level.getGoal(row, col);
                 char b = Character.toLowerCase(boxesList.get(row)[col]);
                 if (g > 0 && b != g) {
                     return false;

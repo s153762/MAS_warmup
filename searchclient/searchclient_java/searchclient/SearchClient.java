@@ -8,6 +8,8 @@ public class SearchClient {
     public State initialState;
 
     public SearchClient(BufferedReader serverMessages) throws Exception {
+        ArrayList<String> lines = new ArrayList<>();
+
         // Read lines specifying colors
         String line = serverMessages.readLine();
         if (line.matches("^[a-z]+:\\s*[0-9A-Z](\\s*,\\s*[0-9A-Z])*\\s*$")) {
@@ -15,19 +17,30 @@ public class SearchClient {
             System.exit(1);
         }
 
+        int maxCol = line.length();
+
+        while (!line.equals("")) {
+            if (line.length() > maxCol) {
+                maxCol = line.length();
+            }
+
+            lines.add(line);
+            line = serverMessages.readLine();
+        }
+
         // Set maximum column length to the size of the first line
-        Level level = new Level(line.length());
+        Level level = new Level(lines.size(), maxCol);
         this.initialState = new State(null);
 
         boolean agentFound = false;
         int row = 0;
 
-        while (!line.equals("")) {
-            for (int col = 0; col < line.length(); col++) {
-                char chr = line.charAt(col);
+        for (String l : lines) {
+            for (int col = 0; col < l.length(); col++) {
+                char chr = l.charAt(col);
 
                 if (chr == '+') { // Wall.
-                    level.addWall(true, row,col);
+                    level.addWall(true, row, col);
                     this.initialState.updateBoxesArraySize();
                 } else if ('0' <= chr && chr <= '9') { // Agent.
                     if (agentFound) {
@@ -40,7 +53,7 @@ public class SearchClient {
                 } else if ('A' <= chr && chr <= 'Z') { // Box.
                     this.initialState.addBox(chr, row, col);
                 } else if ('a' <= chr && chr <= 'z') { // Goal.
-                    level.addGoal(chr,row,col);
+                    level.addGoal(chr, row, col);
                 } else if (chr == ' ') {
                     // Free space.
                 } else {
@@ -48,7 +61,6 @@ public class SearchClient {
                     System.exit(1);
                 }
             }
-            line = serverMessages.readLine();
             row++;
         }
     }
