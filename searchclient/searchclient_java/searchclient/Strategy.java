@@ -135,11 +135,14 @@ public abstract class Strategy {
 
     public static class StrategyBestFirst extends Strategy {
         private Heuristic heuristic;
+        private ArrayDeque<State> frontier;
+        private HashSet<State> frontierSet;
 
         public StrategyBestFirst(Heuristic h) {
             super();
             this.heuristic = h;
-            throw new NotImplementedException();
+            frontier = new ArrayDeque<>();
+            frontierSet = new HashSet<>();
         }
 
         @Override
@@ -149,7 +152,8 @@ public abstract class Strategy {
 
         @Override
         public void addToFrontier(State n) {
-            throw new NotImplementedException();
+            frontier.addLast(n);
+            frontierSet.add(n);
         }
 
         @Override
