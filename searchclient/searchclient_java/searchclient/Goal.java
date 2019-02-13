@@ -11,10 +11,6 @@ public class Goal {
         this.goalName = goalName;
     }
 
-    public char getGoalName() {
-        return goalName;
-    }
-
     public int getRow() {
         return row;
     }
@@ -23,4 +19,7 @@ public class Goal {
         return col;
     }
 
+    public char getGoalName() {
+        return goalName;
+    }
 }

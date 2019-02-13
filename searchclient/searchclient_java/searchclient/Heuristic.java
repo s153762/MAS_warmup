@@ -12,16 +12,17 @@ public abstract class Heuristic implements Comparator<State> {
 
     public int h(State n) {
         int sum = 0;
-        for(Goal goal: Level.getGoals()){
-            for(int row = 0; row<Level.getMaxCol();row++){
-                for(int col = 0;col<Level.getMaxRow();col++){
-                    if(n.boxesList.get(row)[col] != ' '){
-                        sum+=(goal.getCol()-col)+(goal.getRow()-row);
+        
+        for (Goal goal : Level.getGoals()) {
+            for (int row = 0; row < Level.getMaxRow(); row++) {
+                for (int col = 0; col < Level.getMaxCol(); col++) {
+                    if (n.boxesList.get(row)[col] != ' ' && Character.toLowerCase(n.boxesList.get(row)[col]) == goal.getGoalName()){
+                        sum += Math.abs(goal.getCol() - col) + Math.abs(goal.getRow() - row);
                     }
                 }
             }
-
         }
+        
         return sum;
     }
 
