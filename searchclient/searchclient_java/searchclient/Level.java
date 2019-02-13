@@ -55,10 +55,10 @@ public class Level {
         return max_row;
     }
 
-    public static char[][] getGoalsList(){
+    public static char[][] getGoalsList() {
         return goalsList;
     }
-    public static boolean[][] getWallsList(){
+    public static boolean[][] getWallsList() {
         return wallsList;
     }
 
