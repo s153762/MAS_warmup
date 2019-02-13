@@ -10,6 +10,7 @@ public class State {
 
     public int agentRow;
     public int agentCol;
+    private int pathCost;
 
     // Arrays are indexed from the top-left of the level, with first index being row and second being column.
     // Row 0: (0,0) (0,1) (0,2) (0,3) ...
@@ -225,5 +226,13 @@ public class State {
             char[] boxRow = new char[Level.getMaxCol()];
             this.boxesList.add(boxRow);
         }
+    }
+
+    public int getPathCost() {
+        return pathCost;
+    }
+
+    public void setPathCost(int pathCost) {
+        this.pathCost = pathCost;
     }
 }

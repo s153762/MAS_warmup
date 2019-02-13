@@ -135,36 +135,41 @@ public abstract class Strategy {
 
     public static class StrategyBestFirst extends Strategy {
         private Heuristic heuristic;
+        private OrderedStateList<State> orderedList;
 
         public StrategyBestFirst(Heuristic h) {
             super();
             this.heuristic = h;
+            this.orderedList = new OrderedStateList<>();
             throw new NotImplementedException();
         }
 
         @Override
         public State getAndRemoveLeaf() {
-            throw new NotImplementedException();
+            State state = orderedList.getFirst();
+            orderedList.remove(state);
+            return state;
         }
 
         @Override
         public void addToFrontier(State n) {
-            throw new NotImplementedException();
+            n.setPathCost(heuristic.h(n));
+            orderedList.orderedAdd(n);
         }
 
         @Override
         public int countFrontier() {
-            throw new NotImplementedException();
+            return orderedList.size();
         }
 
         @Override
         public boolean frontierIsEmpty() {
-            throw new NotImplementedException();
+            return orderedList.isEmpty();
         }
 
         @Override
         public boolean inFrontier(State n) {
-            throw new NotImplementedException();
+            return orderedList.contains(n);
         }
 
         @Override
