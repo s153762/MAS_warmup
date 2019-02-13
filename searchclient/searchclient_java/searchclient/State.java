@@ -166,8 +166,8 @@ public class State {
             result = prime * result + this.agentCol;
             result = prime * result + this.agentRow;
             result = prime * result + Arrays.deepHashCode(boxesToList(this.boxesList));
-            result = prime * result + Arrays.deepHashCode(Level.getGoals());
-            result = prime * result + Arrays.deepHashCode(Level.getWalls());
+            result = prime * result + Arrays.deepHashCode(Level.getGoalsList());
+            result = prime * result + Arrays.deepHashCode(Level.getWallsList());
             this._hash = result;
         }
         return this._hash;

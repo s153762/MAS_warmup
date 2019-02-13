@@ -1,14 +1,28 @@
 package searchclient;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 
 public abstract class Heuristic implements Comparator<State> {
     public Heuristic(State initialState) {
         // Here's a chance to pre-process the static parts of the level.
+        // Already done ;)
+
     }
 
     public int h(State n) {
-        throw new NotImplementedException();
+        int sum = 0;
+        for(Goal goal: Level.getGoals()){
+            for(int row = 0; row<Level.getMaxCol();row++){
+                for(int col = 0;col<Level.getMaxRow();col++){
+                    if(n.boxesList.get(row)[col] != ' '){
+                        sum+=(goal.getCol()-col)+(goal.getRow()-row);
+                    }
+                }
+            }
+
+        }
+        return sum;
     }
 
     public abstract int f(State n);

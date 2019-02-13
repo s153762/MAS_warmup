@@ -12,16 +12,19 @@ public class Level {
     private static boolean[][] wallsList;
     private static int max_col;
     private static int max_row;
+    private static ArrayList<Goal> goalCoordinates;
 
     public Level(int max_row, int max_col){
         this.max_col = max_col;
         this.max_row = max_row;
         this.goalsList = new char[max_row][max_col];
         this.wallsList = new boolean[max_row][max_col];
+        this.goalCoordinates = new ArrayList<>();
     }
 
     public void addGoal(char goal, int row, int col) {
         this.goalsList[row][col] = goal;
+        goalCoordinates.add(new Goal(row,col,goal));
     }
 
     public void addWall(boolean wall, int row, int col) {
@@ -30,6 +33,10 @@ public class Level {
 
     public static char getGoal(int row, int col) {
         return goalsList[row][col];
+    }
+
+    public static ArrayList<Goal> getGoals(){
+        return goalCoordinates;
     }
 
     public static boolean getWall(int row, int col) {
@@ -48,24 +55,11 @@ public class Level {
         return max_row;
     }
 
-    public static char[][] getGoals() {
-        char[][] goals = new char[goalsList.length][max_col];
-
-        int i = 0;
-        for(char[] row: goalsList){
-            goals[i] = row;
-        }
-        return goals;
+    public static char[][] getGoalsList(){
+        return goalsList;
     }
-
-    public static boolean[][] getWalls() {
-        boolean[][] walls = new boolean[wallsList.length][max_col];
-
-        int i = 0;
-        for(boolean[] row: wallsList){
-            walls[i] = row;
-        }
-        return walls;
+    public static boolean[][] getWallsList(){
+        return wallsList;
     }
 
 }

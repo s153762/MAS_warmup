@@ -142,7 +142,6 @@ public abstract class Strategy {
             super();
             this.heuristic = h;
             this.orderedList = new OrderedStateList<>();
-
         }
 
         @Override
