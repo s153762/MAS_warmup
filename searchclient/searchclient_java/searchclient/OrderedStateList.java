@@ -20,7 +20,6 @@ public class OrderedStateList<T extends State> extends LinkedList<T> {
             if (elementInList.getPathCost() > element.getPathCost()) {
                 itr.previous();
                 itr.add(element);
-                System.out.println("Adding");
                 return(true);
             }
         }
