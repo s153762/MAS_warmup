@@ -22,4 +22,16 @@ public abstract class Node {
     public char getName() {
         return name;
     }
+
+    public void setRow(int row){
+        this.row=row;
+    }
+
+    public void setCol(int col){
+        this.col=col;
+    }
+
+    public void setName(char name){
+        this.name=name;
+    }
 }

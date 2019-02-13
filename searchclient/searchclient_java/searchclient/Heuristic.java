@@ -14,23 +14,18 @@ public abstract class Heuristic implements Comparator<State> {
 
     public int h(State n) {
         int sum = 0;
-        
-        
-        for (int row = 0; row < Level.getMaxRow(); row++) {
-            for (int col = 0; col < Level.getMaxCol(); col++) {
-                ArrayList<Integer> distanceToGoals = new ArrayList<>();
-
-                for (Goal goal : Level.getGoals()) {
-                    if (n.boxesList.get(row)[col] != ' ' && Character.toLowerCase(n.boxesList.get(row)[col]) == goal.getName()){
-                        distanceToGoals.add(Math.abs(goal.getCol() - col) + Math.abs(goal.getRow() - row));
-                    }
-                }
-                if (!distanceToGoals.isEmpty()) {
-                    sum += Collections.min(distanceToGoals);
+        for(Box box: n.boxes.values()){
+            ArrayList<Integer> distanceToGoals = new ArrayList<>();
+            for(Goal goal:Level.getGoals()){
+                if (Character.toLowerCase(box.getName()) == goal.getName()){
+                    distanceToGoals.add(Math.abs(goal.getCol() - box.getCol()) + Math.abs(goal.getRow() - box.getRow()));
                 }
             }
+            if (!distanceToGoals.isEmpty()) {
+                sum += Collections.min(distanceToGoals);
+            }
         }
-        
+
         return sum;
     }
 

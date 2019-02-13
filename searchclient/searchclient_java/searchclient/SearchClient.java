@@ -41,7 +41,7 @@ public class SearchClient {
 
                 if (chr == '+') { // Wall.
                     level.addWall(true, row, col);
-                    this.initialState.updateBoxesArraySize();
+                    //this.initialState.updateBoxesArraySize();
                 } else if ('0' <= chr && chr <= '9') { // Agent.
                     if (agentFound) {
                         System.err.println("Error, not a single agent level");
