@@ -22,7 +22,7 @@ public class State {
     // this.walls[row][col] is true if there's a wall at (row, col)
     //
 
-    public ArrayList<Box> boxesList;
+    public ArrayList<char[]> boxesList;
     //public char[][] boxes;
 
     public State parent;
@@ -34,7 +34,7 @@ public class State {
 
     public State(State parent) {
         this.parent = parent;
-        this.boxesList = new ArrayList<Box>();
+        this.boxesList = new ArrayList<char[]>();
         if (parent == null) {
             this.g = 0;
         } else {
@@ -51,14 +51,15 @@ public class State {
     }
 
     public boolean isGoalState() {
-        for (Box box : boxesList) {
-            char g = Level.getGoal(box.getRow(), box.getCol());
-            char b = Character.toLowerCase(box.getName());
-            if (g > 0 && b != g) {
-                return false;
+        for (int row = 1; row < Level.getMaxRow() - 1; row++) {
+            for (int col = 1; col < Level.getMaxCol() - 1; col++) {
+                char g = Level.getGoal(row, col);
+                char b = Character.toLowerCase(boxesList.get(row)[col]);
+                if (g > 0 && b != g) {
+                    return false;
+                }
             }
         }
-
         return true;
     }
 
@@ -89,9 +90,6 @@ public class State {
                         n.action = c;
                         n.agentRow = newAgentRow;
                         n.agentCol = newAgentCol;
-                        for(Box box:boxesList){
-                            if(box.getRow() )
-                        }
                         n.boxesList.get(newBoxRow)[newBoxCol] = this.boxesList.get(newAgentRow)[newAgentCol];
                         n.boxesList.get(newAgentRow)[newAgentCol] = 0;
                         expandedStates.add(n);

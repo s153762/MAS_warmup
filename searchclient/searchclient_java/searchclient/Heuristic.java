@@ -2,8 +2,6 @@ package searchclient;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Collections;
-
 
 public abstract class Heuristic implements Comparator<State> {
     public Heuristic(State initialState) {
@@ -15,18 +13,12 @@ public abstract class Heuristic implements Comparator<State> {
     public int h(State n) {
         int sum = 0;
         
-        
-        for (int row = 0; row < Level.getMaxRow(); row++) {
-            for (int col = 0; col < Level.getMaxCol(); col++) {
-                ArrayList<Integer> distanceToGoals = new ArrayList<>();
-
-                for (Goal goal : Level.getGoals()) {
-                    if (n.boxesList.get(row)[col] != ' ' && Character.toLowerCase(n.boxesList.get(row)[col]) == goal.getName()){
-                        distanceToGoals.add(Math.abs(goal.getCol() - col) + Math.abs(goal.getRow() - row));
+        for (Goal goal : Level.getGoals()) {
+            for (int row = 0; row < Level.getMaxRow(); row++) {
+                for (int col = 0; col < Level.getMaxCol(); col++) {
+                    if (n.boxesList.get(row)[col] != ' ' && Character.toLowerCase(n.boxesList.get(row)[col]) == goal.getGoalName()){
+                        sum += Math.abs(goal.getCol() - col) + Math.abs(goal.getRow() - row);
                     }
-                }
-                if (!distanceToGoals.isEmpty()) {
-                    sum += Collections.min(distanceToGoals);
                 }
             }
         }
