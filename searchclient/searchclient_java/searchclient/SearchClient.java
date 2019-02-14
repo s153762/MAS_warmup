@@ -53,7 +53,9 @@ public class SearchClient {
                 } else if ('A' <= chr && chr <= 'Z') { // Box.
                     this.initialState.addBox(chr, row, col);
                 } else if ('a' <= chr && chr <= 'z') { // Goal.
-                    level.addGoal(chr, row, col);
+                    Node goalNode = new Node(row, col);
+                    goalNode.setGoal(new Goal(String.valueOf(chr)));
+                    level.addGoal(goalNode);
                 } else if (chr == ' ') {
                     // Free space.
                 } else {

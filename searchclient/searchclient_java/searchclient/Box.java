@@ -1,19 +1,17 @@
 package searchclient;
 
-public class Goal {
+public class Box {
+
     private String name;
     private String color;
 
-    public Goal(String name){
+    public Box(String name, String color) {
         this.name = name;
-        //this.color = color;
-    }
-
-    public String getName() {
-        return name;
+        this.color = color;
     }
 
     public String getColor() { return color; }
 
+    public String getName() { return name; }
 
 }
