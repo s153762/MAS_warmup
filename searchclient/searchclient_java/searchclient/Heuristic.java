@@ -27,17 +27,17 @@ public abstract class Heuristic implements Comparator<State> {
             position = n.keyToPosition(key);
 
             // The distance from the box to the agent
-            distanceAgentToBox = (int) (0.8 * (Math.abs(n.agentCol - position[1]) + Math.abs(n.agentRow - position[0])));
+            distanceAgentToBox = (int) (0.75 * (Math.abs(n.agentCol - position[1]) + Math.abs(n.agentRow - position[0])));
 
             for (Goal goal : goals) {
                 if(Character.toLowerCase(n.boxesMap.get(key))==goal.getGoalName()){
                     distanceBoxToGoal = (Math.abs(goal.getCol() - position[1]) + Math.abs(goal.getRow() - position[0]));
-                    if(distanceBoxToGoal == 0){
-                        distanceToGoal.add(0);
+                    if(distanceBoxToGoal == 0) {
+                        distanceToGoal.add(distanceBoxToGoal);
                         break;
-                    } else {
-                        distanceToGoal.add(distanceBoxToGoal+distanceAgentToBox);
                     }
+
+                    distanceToGoal.add(distanceBoxToGoal+distanceAgentToBox);
                     //if (distanceBoxToGoal < minDistance){
                     //    minDistance = (distanceBoxToGoal);
                     //    minGoal = goal;
@@ -52,7 +52,7 @@ public abstract class Heuristic implements Comparator<State> {
 
            // removing closest goal from the list
            //goals.remove(minGoal);
-           //distanceToGoal.clear();
+           distanceToGoal.clear();
 
         }
 
