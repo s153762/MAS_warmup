@@ -1,9 +1,6 @@
 package searchclient;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Random;
+import java.util.*;
 
 public class State {
     private static final Random RNG = new Random(1);
@@ -20,10 +17,8 @@ public class State {
     // (Start in the top left corner, first go down, then go right)
     // E.g. this.walls[2] is an array of booleans having size MAX_COL.
     // this.walls[row][col] is true if there's a wall at (row, col)
-    //
 
-    public ArrayList<char[]> boxesList;
-    //public char[][] boxes;
+    public HashMap<String, Character> boxesMap;
 
     public State parent;
     public Command action;
@@ -34,7 +29,9 @@ public class State {
 
     public State(State parent) {
         this.parent = parent;
-        this.boxesList = new ArrayList<char[]>();
+        // Boxes as HashMap
+        this.boxesMap = new HashMap<>();
+
         if (parent == null) {
             this.g = 0;
         } else {
@@ -51,16 +48,19 @@ public class State {
     }
 
     public boolean isGoalState() {
-        for (int row = 1; row < Level.getMaxRow() - 1; row++) {
-            for (int col = 1; col < Level.getMaxCol() - 1; col++) {
-                char g = Level.getGoal(row, col);
-                char b = Character.toLowerCase(boxesList.get(row)[col]);
-                if (g > 0 && b != g) {
-                    return false;
-                }
+        for(String key: this.boxesMap.keySet()){
+            int[] position = keyToPosition(key);
+            char g = Level.getGoal(position[0], position[1]);
+            char b = Character.toLowerCase(this.boxesMap.get(key));
+            if (g > 0 && b == g) {
+                return true;
             }
         }
-        return true;
+        return false;
+    }
+
+    private String positionToKey(int row, int col) {
+        return "("+row+","+col+")";
     }
 
     public ArrayList<State> getExpandedStates() {
@@ -90,8 +90,10 @@ public class State {
                         n.action = c;
                         n.agentRow = newAgentRow;
                         n.agentCol = newAgentCol;
-                        n.boxesList.get(newBoxRow)[newBoxCol] = this.boxesList.get(newAgentRow)[newAgentCol];
-                        n.boxesList.get(newAgentRow)[newAgentCol] = 0;
+
+                        // Boxes as HashMap
+                        n.boxesMap.put(positionToKey(newBoxRow,newBoxCol),this.boxesMap.get(positionToKey(newAgentRow,newAgentCol)));
+                        n.boxesMap.remove(positionToKey(newAgentRow,newAgentCol));
                         expandedStates.add(n);
                     }
                 }
@@ -106,8 +108,10 @@ public class State {
                         n.action = c;
                         n.agentRow = newAgentRow;
                         n.agentCol = newAgentCol;
-                        n.boxesList.get(this.agentRow)[this.agentCol] = this.boxesList.get(boxRow)[boxCol];
-                        n.boxesList.get(boxRow)[boxCol] = 0;
+
+                        // Boxes as HashMap
+                        n.boxesMap.put(positionToKey(this.agentRow,this.agentCol),this.boxesMap.get(positionToKey(boxRow,boxCol)));
+                        n.boxesMap.remove(positionToKey(boxRow,boxCol));
                         expandedStates.add(n);
                     }
                 }
@@ -118,21 +122,19 @@ public class State {
     }
 
     private boolean cellIsFree(int row, int col) {
-        return !Level.getWall(row,col) && this.boxesList.get(row)[col] == 0;
+        return !Level.getWall(row,col) && boxesToList(this.boxesMap)[row][col] == 0;
+
     }
 
     private boolean boxAt(int row, int col) {
-        return this.boxesList.get(row)[col] > 0;
+        return boxesToList(this.boxesMap)[row][col] > 0;
     }
 
     private State ChildState() {
         State copy = new State(this);
-        int i = 0;
-        for (char[] row: this.boxesList) {
-            copy.boxesList.add(new char[Level.getMaxCol()]);
-            System.arraycopy(row, 0, copy.boxesList.get(i), 0, Level.getMaxCol());
-            i++;
-        }
+
+        // Boxes as HashMap
+        copy.boxesMap.putAll(this.boxesMap);
         return copy;
     }
 
@@ -165,12 +167,43 @@ public class State {
             int result = 1;
             result = prime * result + this.agentCol;
             result = prime * result + this.agentRow;
-            result = prime * result + Arrays.deepHashCode(boxesToList(this.boxesList));
+
+            // Boxes as HashMap
+            result = prime * result + Arrays.deepHashCode(boxesToList(this.boxesMap));
             result = prime * result + Arrays.deepHashCode(Level.getGoalsList());
             result = prime * result + Arrays.deepHashCode(Level.getWallsList());
             this._hash = result;
         }
         return this._hash;
+    }
+
+    private char[][] boxesToList(HashMap<String, Character> boxesMap) {
+        char[][] map = new char[Level.getMaxRow()][Level.getMaxCol()];
+        for(String key:boxesMap.keySet()){
+            if (boxesMap.get(key) != null){
+                int[] position = keyToPosition(key);
+                map[position[0]][position[1]] = boxesMap.get(key);
+            } else {
+                System.err.println("boxesToList: "+key+", "+boxesMap.get(key)+" - ");
+            }
+
+        }
+        return map;
+    }
+
+    public int[] keyToPosition(String key) {
+        int[] position = new int[2];
+        String[] temp = key.split(",");
+
+        // find row
+        temp[0] = temp[0].replace("(","");
+        position[0] = Integer.parseInt(temp[0]);
+
+        // Find col
+        temp[1] = temp[1].replace(")","");
+        position[1] = Integer.parseInt(temp[1]);
+
+        return position;
     }
 
     @Override
@@ -184,7 +217,7 @@ public class State {
         State other = (State) obj;
         if (this.agentRow != other.agentRow || this.agentCol != other.agentCol)
             return false;
-        return Arrays.deepEquals(boxesToList(this.boxesList), boxesToList(other.boxesList));
+        return Arrays.deepEquals(boxesToList(this.boxesMap), boxesToList(other.boxesMap));
     }
 
     @Override
@@ -195,8 +228,8 @@ public class State {
                 break;
             }
             for (int col = 0; col < Level.getMaxCol(); col++) {
-                if (this.boxesList.get(row)[col] > 0) {
-                    s.append(this.boxesList.get(row)[col]);
+                if (this.boxesMap.get(positionToKey(row,col)) > 0) {
+                    s.append(this.boxesMap.get(positionToKey(row,col)));
                 } else if (Level.getGoal(row,col) > 0) {
                     s.append(Level.getGoal(row,col));
                 } else if (Level.getWall(row,col)) {
@@ -213,20 +246,10 @@ public class State {
     }
 
     public void addBox(char chr, int row, int col) {
-        // Dynamic amount of rows
-        while(this.boxesList.size() <= row){
-            char[] boxRow = new char[Level.getMaxCol()];
-            this.boxesList.add(boxRow);
-        }
-        this.boxesList.get(row)[col] = chr;
+        // HashMap Boxes
+        this.boxesMap.put(positionToKey(row,col),chr);
     }
 
-    public void updateBoxesArraySize() {
-        while(this.boxesList.size() < Level.getMaxRow()){
-            char[] boxRow = new char[Level.getMaxCol()];
-            this.boxesList.add(boxRow);
-        }
-    }
 
     public int getPathCost() {
         return pathCost;
