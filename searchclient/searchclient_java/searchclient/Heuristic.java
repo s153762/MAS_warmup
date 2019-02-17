@@ -15,18 +15,23 @@ public abstract class Heuristic implements Comparator<State> {
         int sum = 0;
         Goal minGoal = null;
         ArrayList<Goal> goals = new ArrayList<>(Level.getGoals());
+        ArrayList<Integer> distanceToGoal = new ArrayList<>();
+        int[] position;
+        int minDistance;
+        int distanceAgentToBox;
+        int distanceBoxToGoal;
+
 
         for(String key :n.boxesMap.keySet()){
-            int minDistance = 2*Level.getMaxCol()+Level.getMaxRow();
-            int[] position = n.keyToPosition(key);
-            // The distance from the box to the agent
-            int distanceAgentToBox = (int) Math.abs(n.agentCol - position[1]) + Math.abs(n.agentRow - position[0]);
+            minDistance = 2*Level.getMaxCol()+Level.getMaxRow();
+            position = n.keyToPosition(key);
 
-            ArrayList<Integer> distanceToGoal = new ArrayList<>();
+            // The distance from the box to the agent
+            distanceAgentToBox = Math.abs(n.agentCol - position[1]) + Math.abs(n.agentRow - position[0]);
 
             for (Goal goal : goals) {
                 if(Character.toLowerCase(n.boxesMap.get(key))==goal.getGoalName()){
-                    int distanceBoxToGoal = (int) 2* Math.abs(goal.getCol() - position[1]) + Math.abs(goal.getRow() - position[0]);
+                    distanceBoxToGoal = 2* Math.abs(goal.getCol() - position[1]) + Math.abs(goal.getRow() - position[0]);
                     distanceToGoal.add(distanceBoxToGoal+distanceAgentToBox);
                     if (distanceBoxToGoal<minDistance){
                         minDistance = (distanceBoxToGoal+distanceAgentToBox);
@@ -35,22 +40,19 @@ public abstract class Heuristic implements Comparator<State> {
                 }
             }
 
+            // The distance from the box to the closest goal
            if (!distanceToGoal.isEmpty()) {
-               // The distance from the box to the closest goal
                sum += Collections.min(distanceToGoal);
            } else {
                //System.err.println("Empty Box? ");
            }
+
            // removing closest goal from the list
            goals.remove(minGoal);
-
-
-
+           distanceToGoal.clear();
 
         }
 
-
-        
         return sum;
     }
 
