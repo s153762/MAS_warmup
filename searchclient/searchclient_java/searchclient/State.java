@@ -48,15 +48,22 @@ public class State {
     }
 
     public boolean isGoalState() {
-        for(String key: this.boxesMap.keySet()){
-            int[] position = keyToPosition(key);
-            char g = Level.getGoal(position[0], position[1]);
-            char b = Character.toLowerCase(this.boxesMap.get(key));
-            if (g > 0 && b == g) {
-                return true;
+        for(Goal goal: Level.getGoals()){
+            String key = positionToKey(goal.getRow(),goal.getCol());
+
+            // Is there a box on the goal?
+            if(this.boxesMap.get(key) == null) {
+                return false;
             }
+
+            // Is the box on the goal the correct box?
+            char b = Character.toLowerCase(this.boxesMap.get(key));
+            if(goal.getGoalName() > 0 && b != goal.getGoalName()) {
+                return false;
+            }
+
         }
-        return false;
+        return true;
     }
 
     private String positionToKey(int row, int col) {
